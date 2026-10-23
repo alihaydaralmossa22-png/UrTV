@@ -319,7 +319,7 @@ public class MainActivity extends Activity {
         wifiPill = pill("واي فاي", R.drawable.ic_wifi);
         wifiPill.setOnClickListener(v -> launch(new Intent(Settings.ACTION_WIFI_SETTINGS)));
         TextView settings = pill("الإعدادات", R.drawable.ic_settings);
-        settings.setOnClickListener(v -> launch(new Intent(Settings.ACTION_SETTINGS)));
+        settings.setOnClickListener(v -> showSettingsMenu(settings));
         for (TextView p : isInstalled(SAVER_PKG) ? new TextView[]{inputs, wifiPill, settings, saver}
                                                   : new TextView[]{inputs, wifiPill, settings}) {
             right.addView(p, llp(-2, dp(30), dp(10), 0, 0, 0));
@@ -701,7 +701,25 @@ public class MainActivity extends Activity {
         rows.get(0).requestFocus();
     }
 
-    private String inputLabel(TvInputInfo t) {
+    private void showSettingsMenu(View anchor) {
+    android.widget.PopupMenu menu = new android.widget.PopupMenu(this, anchor);
+    addSettingsItem(menu, "الشبكة والإنترنت", Settings.ACTION_WIFI_SETTINGS);
+    addSettingsItem(menu, "البلوتوث", Settings.ACTION_BLUETOOTH_SETTINGS);
+    addSettingsItem(menu, "الصوت", Settings.ACTION_SOUND_SETTINGS);
+    addSettingsItem(menu, "الصورة والشاشة", Settings.ACTION_DISPLAY_SETTINGS);
+    addSettingsItem(menu, "إدارة التطبيقات", Settings.ACTION_APPLICATION_SETTINGS);
+    addSettingsItem(menu, "كل إعدادات التلفزيون", Settings.ACTION_SETTINGS);
+    menu.show();
+}
+
+private void addSettingsItem(android.widget.PopupMenu menu, String label, String action) {
+    menu.getMenu().add(label).setOnMenuItemClickListener(item -> {
+        if (!launch(new Intent(action))) launch(new Intent(Settings.ACTION_SETTINGS));
+        return true;
+    });
+}
+
+private String inputLabel(TvInputInfo t) {
         CharSequence c = t.loadCustomLabel(this);
         if (c == null || c.length() == 0) c = t.loadLabel(this);
         return String.valueOf(c);
